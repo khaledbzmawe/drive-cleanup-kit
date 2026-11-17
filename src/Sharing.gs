@@ -115,7 +115,7 @@ function applyOne_(id, remove, action) {
   const done = [], failed = [];
   const fail = function (what, e) {
     const msg = shortErr_(e);
-    failed.push(what + ': ' + msg + (/inherit/i.test(msg) ? t_('hint_inherited') : ''));
+    failed.push(what + (/inherit/i.test(msg) ? t_('hint_inherited') : ': ' + msg));
   };
 
   perms.forEach(function (p) {
@@ -134,7 +134,8 @@ function applyOne_(id, remove, action) {
     }
   });
 
-  let s = done.length ? done.join('; ') : t_('st_nothing');
-  if (failed.length) s += ' | ' + t_('st_failed', failed.join('; '));
-  return s;
+  const parts = [];
+  if (done.length) parts.push(done.join('; '));
+  if (failed.length) parts.push(t_('st_failed', failed.join('; ')));
+  return parts.length ? parts.join(' | ') : t_('st_nothing');
 }

@@ -38,6 +38,11 @@ function fixture() {
       created: '2024-02-01T00:00:00Z', modified: '2024-02-01T00:01:00Z', content: { text: 'hello' } },
     { id: 'FILE_BLANK', name: 'blank.txt', mimeType: 'text/plain', parents: ['ROOT'], owner: ME, size: 0, perms: [owner] },
     { id: 'FILE_RAW', name: 'raw.mov', mimeType: 'video/quicktime', parents: ['FOLDER_MISC'], owner: ME, size: 300 * 1048576, md5: 'bbb', perms: [owner] },
+    { id: 'FOLDER_EXSTAFF', name: 'Ex-staff folder', mimeType: FOLDER, parents: ['ROOT'], owner: 'ex.staff@old.example',
+      perms: [{ type: 'user', role: 'owner', emailAddress: 'ex.staff@old.example' }] },
+    { id: 'DOC_STUCK', name: 'Stuck doc', mimeType: DOC, parents: ['FOLDER_EXSTAFF'], owner: ME, content: { text: 'x' },
+      created: '2024-02-01T00:00:00Z', modified: '2024-05-01T00:00:00Z',
+      perms: [owner, Object.assign(ex('FOLDER_EXSTAFF'), {})] },
     { id: 'FILE_THEIRS', name: 'their file', mimeType: 'application/pdf', parents: ['FOLDER_CLIENTS'], owner: 'other@example.com', size: 9, md5: 'ccc' },
     { id: 'FILE_SHARED_WITH_ME', name: 'not in my drive', mimeType: 'application/pdf', parents: ['SOMEONE_ELSES_FOLDER'], owner: 'other@example.com' }
   ];
@@ -95,10 +100,10 @@ for (const lang of ['en', 'ar']) {
   assert(scanRuns > 0, 'the scan should have needed more than one run');
   const shared = tab(t, 'tab_shared');
   assert.deepStrictEqual(shared.map((r) => r[8]).sort(),
-    ['DOC_PROPOSAL', 'FILE_VIDEO_1', 'FOLDER_CLIENTS', 'FOLDER_CLIENT_A'], 'shared items');
+    ['DOC_PROPOSAL', 'DOC_STUCK', 'FILE_VIDEO_1', 'FOLDER_CLIENTS', 'FOLDER_CLIENT_A'], 'shared items');
   const notMine = tab(t, 'tab_notmine');
-  assert.strictEqual(notMine.length, 1, 'only the foreign file inside My Drive');
-  assert.strictEqual(notMine[0][3], 'Clients');
+  assert.deepStrictEqual(notMine.map((r) => r[0]).sort(), ['Ex-staff folder', 'their file'], 'only foreign items inside My Drive');
+  assert.strictEqual(notMine.find((r) => r[0] === 'their file')[3], 'Clients');
   const people = tab(t, 'tab_people');
   assert.strictEqual(people.length, 3);
   assert(env.ss.getSheetByName(t.run("t_('tab_summary')")).getLastRow() > 5, 'summary written');
@@ -108,7 +113,7 @@ for (const lang of ['en', 'ar']) {
   t.run('SETTINGS_CACHE = null; buildSharingPlan()');
   const plan = tab(t, 'tab_plan');
   const byId = Object.fromEntries(plan.map((r) => [r[7], r]));
-  assert.deepStrictEqual(Object.keys(byId).sort(), ['DOC_PROPOSAL', 'FILE_VIDEO_1', 'FOLDER_CLIENTS', 'FOLDER_CLIENT_A']);
+  assert.deepStrictEqual(Object.keys(byId).sort(), ['DOC_PROPOSAL', 'DOC_STUCK', 'FILE_VIDEO_1', 'FOLDER_CLIENTS', 'FOLDER_CLIENT_A']);
   assert.strictEqual(plan[0][7], 'FOLDER_CLIENTS', 'top folders first');
   assert.strictEqual(byId.FOLDER_CLIENTS[4], 'ex.staff@old.example', 'ally is kept everywhere');
   assert.strictEqual(byId.DOC_PROPOSAL[4], 'ex.staff@old.example', 'client is kept inside Client A');
@@ -130,7 +135,10 @@ for (const lang of ['en', 'ar']) {
   assert.strictEqual(doc.perms.find((p) => p.type === 'anyone').role, 'reader', 'link is view-only');
   assert(env.byId.FILE_VIDEO_1.perms.some((p) => p.emailAddress === 'client@client.example'), 'unticked row untouched');
   const after = tab(t, 'tab_plan');
-  assert(after.filter((r) => r[0] === true).every((r) => r[6] && !/Failed|لم يتم/.test(r[6])), 'every ticked row has a clean status');
+  const stuck = after.find((r) => r[7] === 'DOC_STUCK')[6];
+  assert(/Failed|لم يتم/.test(stuck) && !/Nothing left|لا شيء متبق/.test(stuck), 'a stuck row says it failed, and only that: ' + stuck);
+  assert(/move this item|انقل هذا العنصر/.test(stuck), 'a stuck row says what to do');
+  assert(after.filter((r) => r[0] === true && r[7] !== 'DOC_STUCK').every((r) => r[6] && !/Failed|لم يتم/.test(r[6])), 'every other ticked row has a clean status');
   assert(!after.find((r) => r[7] === 'FILE_VIDEO_1')[6], 'unticked row has no status');
 
   // 4 · find

@@ -80,7 +80,7 @@ const STRINGS = {
     st_nothing: 'Nothing left to do (a parent folder already handled it)',
     st_failed: 'Failed: {0}',
     st_read_error: 'Could not read the sharing: {0}',
-    hint_inherited: ' (access comes from a parent folder; fix it there)',
+    hint_inherited: ': access comes from a parent folder. If that folder is not yours, move this item into a folder you own and run the plan again.',
 
     k_dup_keep: 'Duplicate · original, kept',
     k_dup_extra: 'Duplicate · extra copy',
@@ -181,7 +181,7 @@ const STRINGS = {
     st_nothing: 'لا شيء متبقٍ (عالجه المجلد الأعلى)',
     st_failed: 'لم يتم: {0}',
     st_read_error: 'تعذّرت قراءة المشاركة: {0}',
-    hint_inherited: ' (الصلاحية موروثة من مجلد أعلى؛ عالجها هناك)',
+    hint_inherited: ': الصلاحية موروثة من مجلد أعلى. إن لم يكن المجلد ملكك، انقل هذا العنصر إلى مجلد تملكه ثم شغّل الخطة مرة أخرى.',
 
     k_dup_keep: 'مكرر · الأصل، يبقى',
     k_dup_extra: 'مكرر · نسخة زائدة',
