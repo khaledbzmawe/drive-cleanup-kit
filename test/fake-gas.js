@@ -38,13 +38,25 @@ function makeSheet(name) {
   return sh;
 }
 
+/**
+ * Sheets reads typed text the way a person would: "2022/10/1" becomes a date and "2024" a number.
+ * A leading apostrophe keeps the text as it is (and is not stored).
+ */
+function parseLikeSheets(v) {
+  if (typeof v !== 'string') return v;
+  if (v.startsWith("'")) return v.slice(1);
+  if (/^\d{4}[/-]\d{1,2}[/-]\d{1,2}$/.test(v)) return new Date(v.replace(/\//g, '-') + 'T00:00:00Z');
+  if (/^-?\d+(\.\d+)?$/.test(v)) return Number(v);
+  return v;
+}
+
 function makeRange(sh, row, col, nr, nc) {
   const rg = {
     setValues(vals) {
       if (vals.length !== nr || vals.some((r) => r.length !== nc)) throw new Error(`setValues size mismatch on ${sh.name}: range ${nr}x${nc}, data ${vals.length}x${vals[0] && vals[0].length}`);
       vals.forEach((r, i) => r.forEach((v, j) => {
         sh.cells[row - 1 + i] = sh.cells[row - 1 + i] || [];
-        sh.cells[row - 1 + i][col - 1 + j] = v;
+        sh.cells[row - 1 + i][col - 1 + j] = parseLikeSheets(v);
       }));
       return rg;
     },
@@ -72,7 +84,9 @@ function makeRange(sh, row, col, nr, nc) {
     },
     setFontWeight() { return rg; },
     setDataValidation() { return rg; },
-    setWrap() { return rg; }
+    setWrap() { return rg; },
+    setVerticalAlignment() { return rg; },
+    setVerticalAlignment() { return rg; }
   };
   return rg;
 }

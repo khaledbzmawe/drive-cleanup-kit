@@ -19,23 +19,23 @@ function ensureSettings_() {
 
   sh = ss.insertSheet(SETTINGS_TAB, 0);
   const rows = [
-    ['Setting · الإعداد', 'Value · القيمة', 'Help · شرح'],
-    ['Language · اللغة', 'en',
-      'en or ar. Choose before the first scan. · اختر قبل أول فحص.'],
-    ['Public edit links · روابط التعديل العامة', 'view',
-      'What to do with "anyone with the link": keep = leave, view = make edit links view-only, remove = remove every public link. · keep = اتركها، view = حوّل روابط التعديل إلى عرض، remove = احذف كل رابط عام.'],
-    ['Large file (MB) · ملف كبير', 200,
-      'Files bigger than this are listed for your review. Never ticked for you. · الملفات الأكبر تُعرض لتقرر بنفسك.'],
-    ['Status · الحالة', '', ''],
+    ['Setting\nالإعداد', 'Value\nالقيمة', 'Help\nشرح'],
+    ['Language\nاللغة', 'en',
+      'en or ar. Choose before the first scan.\nاختر قبل أول فحص.'],
+    ['Public edit links\nروابط التعديل العامة', 'view',
+      'What to do with "anyone with the link": keep = leave, view = make edit links view-only, remove = remove every public link.\nkeep = اتركها، view = حوّل روابط التعديل إلى عرض، remove = احذف كل رابط عام.'],
+    ['Large file (MB)\nملف كبير', 200,
+      'Files bigger than this are listed for your review. Never ticked for you.\nالملفات الأكبر تُعرض لتقرر بنفسك.'],
+    ['Status\nالحالة', '', ''],
     ['', '', ''],
-    ['People to keep: email · من يبقى: البريد', 'Only inside this folder (optional link) · داخل هذا المجلد فقط (اختياري)', 'Note · ملاحظة']
+    ['People to keep: email\nمن يبقى: البريد', 'Only inside this folder (optional link)\nداخل هذا المجلد فقط (اختياري)', 'Note\nملاحظة']
   ];
   sh.getRange(1, 1, rows.length, 3).setValues(rows);
   sh.getRange('A1:C1').setFontWeight('bold');
   sh.getRange('A7:C7').setFontWeight('bold');
   sh.getRange('B2').setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(['en', 'ar']).build());
   sh.getRange('B3').setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(['keep', 'view', 'remove']).build());
-  sh.getRange('C2:C4').setWrap(true);
+  sh.getRange('A1:C7').setWrap(true).setVerticalAlignment('top');
   sh.setColumnWidth(1, 260);
   sh.setColumnWidth(2, 320);
   sh.setColumnWidth(3, 420);

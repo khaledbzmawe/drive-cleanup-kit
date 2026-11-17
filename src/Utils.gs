@@ -86,10 +86,13 @@ function confirm_(msg) {
   return ui.alert(APP_NAME, msg, ui.ButtonSet.YES_NO) === ui.Button.YES;
 }
 
-/** Stops Sheets from reading names that start with = + - @ as formulas. */
+/**
+ * Keeps a name exactly as it is. Without the leading apostrophe Sheets reads "=x" as a formula,
+ * "2022/10/1" as a date and "2024" as a number.
+ */
 function safe_(s) {
   s = String(s == null ? '' : s);
-  return /^[=+\-@]/.test(s) ? "'" + s : s;
+  return /^[=+\-@]/.test(s) || /^[\d\s/.,:-]+$/.test(s) ? "'" + s : s;
 }
 
 function fileLink_(id) {
@@ -97,7 +100,7 @@ function fileLink_(id) {
 }
 
 function mb_(bytes) {
-  return Math.round(Number(bytes || 0) / 1048576 * 10) / 10;
+  return Math.round(Number(bytes || 0) / 1048576 * 100) / 100;
 }
 
 function shortErr_(e) {

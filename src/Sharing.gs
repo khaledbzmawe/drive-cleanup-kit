@@ -37,7 +37,7 @@ function buildSharingPlan() {
     if (action) linkChanges++;
     const path = String(r[SH.path]);
     const depth = path === t_('root') ? 0 : path.split(' / ').length;
-    plan.push([true, r[SH.name], r[SH.type], path, remove.join(', '),
+    plan.push([true, safe_(r[SH.name]), r[SH.type], safe_(path), remove.join(', '),
       action ? t_('link_act_' + action) : '', '', id, action, depth]);
   });
 

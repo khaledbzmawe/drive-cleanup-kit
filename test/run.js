@@ -26,7 +26,8 @@ function fixture() {
       perms: [owner, ally('FOLDER_CLIENTS'), ex('FOLDER_CLIENTS'), client()] },
     { id: 'DOC_PROPOSAL', name: 'Proposal', mimeType: DOC, parents: ['FOLDER_CLIENT_A'], owner: ME,
       perms: [owner, ally('FOLDER_CLIENTS'), ex('FOLDER_CLIENTS'), client('FOLDER_CLIENT_A'), { type: 'anyone', role: 'writer' }] },
-    { id: 'FILE_VIDEO_1', name: 'video.mp4', mimeType: 'video/mp4', parents: ['ROOT'], owner: ME, size: 5, md5: 'aaa',
+    { id: 'FOLDER_DATE', name: '2022/10/1', mimeType: FOLDER, parents: ['ROOT'], owner: ME, perms: [owner] },
+    { id: 'FILE_VIDEO_1', name: 'video.mp4', mimeType: 'video/mp4', parents: ['FOLDER_DATE'], owner: ME, size: 5, md5: 'aaa',
       created: '2024-01-01T00:00:00Z', perms: [owner, client()] },
     { id: 'FOLDER_MISC', name: 'Misc', mimeType: FOLDER, parents: ['ROOT'], owner: ME, perms: [owner] },
     { id: 'FILE_VIDEO_2', name: '=video copy.mp4', mimeType: 'video/mp4', parents: ['FOLDER_MISC'], owner: ME, size: 5, md5: 'aaa',
@@ -113,6 +114,7 @@ for (const lang of ['en', 'ar']) {
   assert.strictEqual(byId.DOC_PROPOSAL[4], 'ex.staff@old.example', 'client is kept inside Client A');
   assert.strictEqual(byId.DOC_PROPOSAL[8], 'view', 'public edit link becomes view-only');
   assert.strictEqual(byId.FILE_VIDEO_1[4], 'client@client.example', 'client is removed outside Client A');
+  assert.strictEqual(byId.FILE_VIDEO_1[3], '2022/10/1', 'a folder named like a date keeps its name');
   assert(plan.every((r) => r[0] === true), 'every row ticked by default');
 
   // untick one row: it must stay untouched
@@ -140,7 +142,8 @@ for (const lang of ['en', 'ar']) {
     DOC_UNTITLED: 'empty_file', FILE_BLANK: 'empty_file', FILE_RAW: 'large'
   });
   assert(!('FILE_THEIRS' in code), 'files you do not own are never listed');
-  assert.strictEqual(cand.find((r) => r[8] === 'FILE_VIDEO_2')[2], "'=video copy.mp4", 'formula-looking names are escaped');
+  assert.strictEqual(cand.find((r) => r[8] === 'FILE_VIDEO_2')[2], '=video copy.mp4', 'formula-looking names stay text');
+  assert.strictEqual(cand.find((r) => r[8] === 'FILE_VIDEO_1')[4], '2022/10/1', 'date-looking folder names stay text');
 
   // tick every row, including the original duplicate: the last copy must survive
   const candSheet = env.ss.getSheetByName(t.run("t_('tab_cand')"));
