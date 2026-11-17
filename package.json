@@ -1,0 +1,10 @@
+{
+  "name": "drive-cleanup-kit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Audit Google Drive sharing, take access back, and clear duplicates and empty files from a Google Sheet (Apps Script).",
+  "license": "MIT",
+  "scripts": {
+    "test": "node test/run.js"
+  }
+}
